@@ -17,8 +17,9 @@ __pycache__/
 .vscode/
 .idea/
 
-# Data files (exclude the dataset folder)
-data/dataset/
+# Data files (exclude the images folders)
+data/dataset/images/
+data/coral_condition/images
 
 # Environment variables
 .env
@@ -26,3 +27,6 @@ data/dataset/
 
 # Playground notebook for local tests
 notebooks/test_notebook.ipynb
+
+# Temporary files
+missing_images.txt
