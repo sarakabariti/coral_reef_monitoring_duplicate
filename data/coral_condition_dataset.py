@@ -10,6 +10,7 @@ class CoralConditionDataset:
         self.IMAGES_PATH = os.path.join(dataset_path, "images")
         self.ANNOTATIONS_PATH = pd.read_csv(os.path.join(dataset_path, "annotations.csv"))
         self.LABELSET_PATH = pd.read_csv(os.path.join(dataset_path, "labelset.csv"))
+        self.METADATA_PATH = pd.read_csv(os.path.join(dataset_path, "surveys_metadata.csv"))
         self._preprocess_annotations()
         
     def get_image(self, patch_id):
