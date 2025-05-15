@@ -11,7 +11,6 @@ class CoralConditionDataset:
         self.ANNOTATIONS_PATH = pd.read_csv(os.path.join(dataset_path, "annotations.csv"))
         self.LABELSET_PATH = pd.read_csv(os.path.join(dataset_path, "labelset.csv"))
         self.METADATA_PATH = pd.read_csv(os.path.join(dataset_path, "surveys_metadata.csv"))
-        self._preprocess_annotations()
         
     def get_image(self, patch_id):
         img_path = os.path.join(self.IMAGES_PATH, f"{patch_id}.jpg")  
@@ -20,17 +19,22 @@ class CoralConditionDataset:
     def get_label(self, patch_id):
         return self.ANNOTATIONS_PATH[self.ANNOTATIONS_PATH["patchid"] == patch_id]["label"].values[0]
     
-    def _preprocess_annotations(self):
-        """Convert labels to lists and cache binary matrix for NPMI calculations"""
-        self.ANNOTATIONS_PATH['label_list'] = self.ANNOTATIONS_PATH['label'].apply(
-            lambda x: [int(x)] if isinstance(x, int) else [int(l) for l in str(x).split(',')]
-        )
+    def get_preprocessed_annotations(self):
+        """Converts labels to lists and cache binary matrix for NPMI calculations"""
+        # Create a clean copy (don't modify original)
+        annotations = self.ANNOTATIONS_PATH.copy()
+        # Add label_list column if not present
+        if 'label_list' not in annotations.columns:
+            annotations['label_list'] = annotations['label'].apply(
+                lambda x: [int(x)] if isinstance(x, int) else [int(l) for l in str(x).split(',')]
+            )
         self.mlb = MultiLabelBinarizer()
         self.binary_matrix = pd.DataFrame(
-            self.mlb.fit_transform(self.ANNOTATIONS_PATH['label_list']),
+            self.mlb.fit_transform(annotations['label_list']),
             columns=self.mlb.classes_,
-            index=self.ANNOTATIONS_PATH.index
+            index=annotations.index
         )
+        return annotations
     
     def multi_label_npmi(self, context_labels: list, target_label: str):
         """Calculate Normalized Pointwise Mutual Information (NPMI) between a set of context labels and a target label."""
