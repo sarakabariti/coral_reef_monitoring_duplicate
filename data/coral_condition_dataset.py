@@ -8,9 +8,9 @@ import random
 
 class CoralConditionDataset:
     """A class to handle the coral condiition dataset."""
-    def __init__(self, dataset_path: str ="data/coral_condition/"):
+    def __init__(self, dataset_path: str ="data/coral_condition/", annotations_file: str = None):
         self.IMAGES_PATH = os.path.join(dataset_path, "images")
-        self.ANNOTATIONS_PATH = pd.read_csv(os.path.join(dataset_path, "annotations.csv"))
+        self.ANNOTATIONS_PATH = pd.read_csv(os.path.join(dataset_path, annotations_file)) if annotations_file else pd.read_csv(os.path.join(dataset_path, "annotations.csv"))
         self.LABELSET_PATH = pd.read_csv(os.path.join(dataset_path, "labelset.csv"))
         self.METADATA_PATH = pd.read_csv(os.path.join(dataset_path, "surveys_metadata.csv"))
 
