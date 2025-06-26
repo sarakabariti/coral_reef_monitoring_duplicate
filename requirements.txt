@@ -1,0 +1,14 @@
+scipy
+scikit-learn
+matplotlib
+numpy
+pandas
+seaborn
+tqdm
+tensorboard
+wandb
+
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch
+torchvision
+torchaudio

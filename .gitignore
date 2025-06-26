@@ -29,3 +29,8 @@ notebooks/test_notebook.ipynb
 
 # Temporary files
 missing_images.txt
+
+# Weights and Biases
+wandb/
+
+runs/

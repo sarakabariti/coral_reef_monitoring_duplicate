@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
+import torch
+from torch.utils.data import Dataset
 from PIL import Image
 import random
 
@@ -30,7 +32,7 @@ class CoralConditionDataset:
     def get_preprocessed_annotations(self):
         """Converts labels to lists of integers & returns annotations with label_list column"""
         # Create clean copy 
-        annotations = self.ANNOTATIONS_PATH.copy()
+        annotations = pd.read_csv("data/coral_condition/annotations_cleaned.csv")
         annotations['label_list'] = annotations['label'].apply(
             lambda x: [int(x)] if isinstance(x, int) else [int(l) for l in str(x).split(',')]
         )
@@ -131,6 +133,30 @@ class CoralConditionDataset:
         # Convert to dictionary {class index: weight}
         class_weights = {i: weight for i, weight in enumerate(weights)}
         return class_weights
+
+# Create PyTorch Dataset
+class CoralReefDataset(Dataset):
+    def __init__(self, image_ids, labels, processor, transform=None):
+        self.image_ids = image_ids.reset_index(drop=True)
+        self.labels = torch.FloatTensor(labels)
+        self.processor = processor
+        self.transform = transform
+        
+    def __len__(self):
+        return len(self.image_ids)
+    
+    def __getitem__(self, idx):
+        # Get image as numpy array from processor
+        img = self.processor.load_image(self.image_ids[idx])  # Returns [H,W,C] numpy array
+        
+        # Convert to tensor and permute if not using transforms
+        if self.transform:
+            img = self.transform(img)  # transforms will handle ToTensor()
+        else:
+            # Default normalization if no transform
+            img = torch.FloatTensor(self.processor.normalize(img)).permute(2, 0, 1)
+            
+        return img, self.labels[idx]
 
 class CoralImageProcessor:
     def __init__(self, images_dir):
